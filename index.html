@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101a4a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Matchday Picks</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e2e8f0;--ac:#1e3a8a;--pop:#ec4899;--g1:#0f172a;--g2:#1e3a8a;--soft:rgba(236,72,153,.12);--ee:#10b981;--me:#2563eb;--ae:#f59e0b;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1020;--card:#171a30;--tx:#eceef8;--mu:#9aa0bd;--bd:#262a47;--ac:#9db0ff;--soft:rgba(157,176,255,.14);--ee:#3ecf86;--me:#6ea8ff;--ae:#f5a524}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;background:var(--bg)}
+body{color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:0 12px 170px;max-width:640px;margin:auto}
+.hd{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;margin:0 -12px 14px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 18px;border-radius:0 0 24px 24px;box-shadow:0 8px 24px rgba(20,30,70,.22)}
+.hd h1{font-size:17px;margin:0;line-height:1.2}.hd small{color:rgba(255,255,255,.88);font-size:12px}
+.pt h2{margin:6px 2px 0;font-size:24px;letter-spacing:-.3px}.pt p{margin:2px 2px 14px;color:var(--mu);font-size:13px}
+.card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 2px 16px rgba(20,30,70,.07)}
+.lab{display:block;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin:12px 2px 0}.lab:first-child{margin-top:0}
+select,input{width:100%;padding:13px 14px;margin:5px 0;border:1.5px solid var(--bd);border-radius:14px;background:var(--card);color:var(--tx);font:inherit}
+select:focus,input:focus{outline:0;border-color:var(--ac);box-shadow:0 0 0 3px var(--soft)}
+.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;margin:10px 2px 0}.chk input{width:auto;margin:0}
+.nt{font-size:12px;color:var(--mu);margin:2px 2px 0}
+details.mk summary{font-weight:700;cursor:pointer;list-style:none;margin-top:14px}details.mk summary::-webkit-details-marker{display:none}details.mk summary:after{content:"▾";float:right;color:var(--mu)}details.mk[open] summary:after{content:"▴"}
+.btn{width:100%;border:0;border-radius:14px;padding:14px;margin-top:14px;font:700 15px system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.5}.btn.ghost{background:var(--card);color:var(--ac);box-shadow:none;border:1.5px solid var(--bd)}
+#msg{margin:12px 2px;color:var(--mu);min-height:1.4em;font-size:14px}
+.meta{font-size:12px;color:var(--mu)}.teams{font-weight:700;font-size:16px;margin:2px 0 10px}
+.prow{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}.pk{font-weight:700;font-size:15px;margin-bottom:6px}
+.pnum{font-size:46px;font-weight:800;line-height:1;letter-spacing:-1px;color:var(--ac)}.pnum small{font-size:18px;margin-left:1px}
+.tag{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:12px;color:#fff}
+.tag.ee{background:var(--ee)}.tag.me{background:var(--me)}.tag.ae{background:var(--ae);color:#3b2600}
+.bar{height:8px;background:var(--bd);border-radius:8px;margin:12px 0 10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--g2),var(--pop))}
+.why{font-size:13px;color:var(--mu)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.chip2{background:var(--soft);border-radius:14px;padding:6px 10px;font-size:12px}.chip2 b{color:var(--ac)}
+details.all{margin-top:10px;font-size:13px}details.all summary{cursor:pointer;color:var(--mu);font-weight:600}.all div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd)}
+.hero{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:26px;padding:18px;margin-bottom:12px;box-shadow:0 12px 26px rgba(20,30,70,.28)}
+.hero .meta,.hero .why{color:rgba(255,255,255,.85)}.hero .pnum{color:#fff;font-size:56px}.hero .bar{background:rgba(255,255,255,.3)}.hero .bar i{background:#fff}
+.hero .chip2{background:rgba(255,255,255,.18)}.hero .chip2 b{color:#fff}.hero details.all summary{color:rgba(255,255,255,.85)}.hero .all div{border-color:rgba(255,255,255,.2)}
+.note{font-size:12px;color:var(--mu);margin:16px 2px 0}
+.mt{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sl{border:1.5px solid var(--bd);background:var(--card);color:var(--ac);border-radius:12px;padding:6px 10px;font:700 12px system-ui,sans-serif;cursor:pointer;white-space:nowrap}.sl.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.hero .sl{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.45)}.hero .sl.on{background:#fff;color:#101a4a}
+.mr{cursor:pointer}.mr.on{font-weight:700;color:var(--ac)}.mr.on>span:first-child:before{content:"✓ "}.hero .mr.on{color:#fff}
+.val{display:flex;align-items:center;gap:8px;margin-top:10px}.val input{width:120px;padding:8px 10px;margin:0;border-radius:10px;font-size:14px}.vr{font-size:13px;font-weight:700}.vr.good{color:var(--ee)}.vr.bad{color:var(--mu)}
+.hero .val input{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)}.hero .vr.good{color:#7dffc0}.hero .vr.bad{color:rgba(255,255,255,.8)}
+#slip{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:616px;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:22px;padding:12px 14px;box-shadow:0 10px 30px rgba(20,30,70,.35);z-index:10;display:flex;align-items:center;gap:8px}
+#slip[hidden]{display:none}#slip b{font-size:24px;line-height:1.1}#slip small{display:block;color:rgba(255,255,255,.8);font-size:11px}#slip button{border:1px solid rgba(255,255,255,.5);background:none;color:#fff;border-radius:14px;padding:8px 12px;font:600 12px system-ui,sans-serif}
+.btnrow{display:flex;gap:8px}.btnrow .btn{margin-top:0}
+.tiles3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.tt{background:var(--soft);border-radius:14px;padding:10px 4px;text-align:center}.tt b{display:block;font-size:20px;color:var(--ac)}.tt small{font-size:11px;color:var(--mu)}
+.tr2{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}.tr2 small{color:var(--mu)}
+.sec2{font-weight:800;font-size:14px;margin:12px 0 4px}.lk{background:none;border:0;color:var(--mu);text-decoration:underline;font:inherit;font-size:12px;margin-top:10px;padding:0}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:616px;display:flex;gap:4px;background:var(--card);border-radius:26px;padding:6px;z-index:11;box-shadow:0 10px 30px rgba(20,30,70,.25)}
+nav button{flex:1;border:0;background:none;color:var(--mu);font:600 11px system-ui,sans-serif;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:20px;cursor:pointer}
+nav button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff}
+.tab[hidden]{display:none}.tab{animation:up .25s both}@keyframes up{from{opacity:0;transform:translateY(8px)}}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}.pill input{display:none}
+.pill span{display:inline-block;padding:8px 13px;border-radius:18px;border:1.5px solid var(--bd);background:var(--bg);color:var(--mu);font:600 13px system-ui,sans-serif;cursor:pointer}
+.pill input:checked+span{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-color:transparent}
+</style></head><body>
+<header class="hd" style="display:flex;align-items:center;gap:12px"><img src="icon-192.png" alt="" width="44" height="44" style="border-radius:12px"><div><h1>Matchday Picks</h1><small>Today’s games, ranked by chance</small></div></header>
+
+<section class="tab" id="t-picks">
+<div class="pt"><h2>Find picks</h2><p>Goals, BTTS, corners and cards come first.</p></div>
+<div class="card">
+<span class="lab" id="mwl">Markets to look at</span>
+<div class="pills" id="mw">
+<label class="pill"><input class="grp" type="checkbox" value="goals" checked><span>Over/under goals</span></label>
+<label class="pill"><input class="grp" type="checkbox" value="btts" checked><span>BTTS</span></label>
+<label class="pill"><input class="grp" type="checkbox" value="corners" checked><span>Corners</span></label>
+<label class="pill"><input class="grp" type="checkbox" value="cards" checked><span>Cards</span></label>
+<label class="pill"><input class="grp" type="checkbox" value="res"><span>Result</span></label>
+<label class="pill"><input class="grp" type="checkbox" value="teams"><span>Extras</span></label>
+</div>
+<label class="chk" id="dw"><input id="deep" type="checkbox" checked>Include corners and cards (about 4 extra requests per pick)</label>
+<div class="row"><div><span class="lab">Date</span><input id="date" type="date"></div><div><span class="lab">Picks wanted</span><input id="want" type="number" min="1" max="30" value="8"></div></div>
+<div class="row"><div><span class="lab">Style</span><select id="mode"><option value="safe">Safe (highest chance)</option><option value="bold">Bold (main markets only)</option></select></div><div><span class="lab">Games to check</span><input id="cap" type="number" min="1" max="60" value="20"></div></div>
+<button id="go" class="btn">Find picks</button><div class="nt" id="pnote"></div>
+</div>
+<div id="msg" role="status"></div>
+<div class="card" id="flt" hidden><div class="row"><div><span class="lab">League</span><select id="lf"><option value="all">All leagues</option></select></div><div><span class="lab">Kickoff</span><select id="tf"><option value="all">All day</option><option value="am">Before 12:00</option><option value="pm">12:00 to 17:00</option><option value="ev">After 17:00</option></select></div></div>
+<span class="lab">Show</span><select id="mf"><option value="all">Best pick per game</option><option value="goals">Over/under goals</option><option value="btts">BTTS</option><option value="corners">Corners</option><option value="cards">Cards</option><option value="res">Result</option></select></div>
+<div id="out"></div>
+<div class="btnrow"><button id="copy" class="btn ghost" hidden>Copy picks</button><button id="sh" class="btn" hidden>Share picks</button></div>
+<p class="note">Picks come from API-Football’s win chances plus a goals model built from each team’s scoring averages, or from bookmaker odds in ESPN mode. They are estimates, not certainties. Picks above 88% are skipped because the odds on them are usually tiny. This app only shows estimates and never places bets. Bet only what you can afford to lose.</p>
+</section>
+
+<section class="tab" id="t-live" hidden>
+<div class="pt"><h2>Live games</h2><p>Scores and live chances from ESPN, refreshed every minute.</p></div>
+<div class="card" id="live"><div class="nt">Your tracked picks show whether they are on course at the current score.</div><div id="lbody"></div><button id="lrf" class="btn ghost">Refresh now</button></div>
+</section>
+
+<section class="tab" id="t-odds" hidden>
+<div class="pt"><h2>Check a game</h2><p>From SportPesa, Betika or any bookmaker.</p></div>
+<div class="card" id="man"><div class="nt">Type the game and its 1, X, 2 odds. The app removes the bookmaker’s margin and shows the real chances.</div>
+<div class="row"><div><span class="lab">Home team</span><input id="mh" placeholder="Home"></div><div><span class="lab">Away team</span><input id="ma" placeholder="Away"></div></div>
+<div class="row"><div><span class="lab">1</span><input id="o1" type="number" step="0.01" min="1.01" inputmode="decimal"></div><div><span class="lab">X</span><input id="ox" type="number" step="0.01" min="1.01" inputmode="decimal"></div><div><span class="lab">2</span><input id="o2" type="number" step="0.01" min="1.01" inputmode="decimal"></div></div>
+<button id="mgo" class="btn">Work it out</button><div id="mres"></div></div>
+</section>
+
+<section class="tab" id="t-track" hidden>
+<div class="pt"><h2>Results tracker</h2><p>How your picks have actually done.</p></div>
+<div class="card" id="trk"><div id="trkb"></div><button id="tchk" class="btn ghost">Check results</button><button id="tclr" class="lk">Clear history</button></div>
+</section>
+
+<section class="tab" id="t-setup" hidden>
+<div class="pt"><h2>Setup</h2><p>Set these once.</p></div>
+<div class="card">
+<span class="lab">Games from</span><select id="src"><option value="espn">ESPN (no key, loads automatically)</option><option value="api">API-Football (needs key)</option></select><div class="nt" id="srcnote"></div>
+<span class="lab" id="kw">API-Football key</span><input id="key" type="password" autocomplete="off" placeholder="Paste your key">
+<span class="lab" id="pw">Plan speed</span><select id="pace"><option value="6500">Free plan (slow)</option><option value="500">Paid plan (fast)</option></select>
+<label class="chk"><input id="top" type="checkbox" checked>Major leagues, Nations League and KPL only</label>
+</div>
+</section>
+
+<nav id="nav"><button data-t="picks" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6l-5.4 2.9 1.2-6L3.3 9.3l6.1-.7z"/></svg><span>Picks</span></button><button data-t="live"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Live</span></button><button data-t="odds"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg><span>Odds</span></button><button data-t="track"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"/></svg><span>Tracker</span></button><button data-t="setup"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Setup</span></button></nav>
+<div id="slip" hidden><div><small>Slip: <span id="sn"></span> · combined chance</small><b id="sp"></b><small>Estimate, assumes picks are independent</small></div><span style="flex:1"></span><button id="sshare">Share</button><button id="sclr">Clear</button></div>
+<script>
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+
+const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const TOP=[39,140,135,78,61,2,3,848,5,276,40,88,94,203,179];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n};
+let KEY='',lastText='';
+try{$('key').value=localStorage.getItem('mp_key')||''}catch(e){}
+$('date').value=ymd(new Date());
+const say=t=>$('msg').textContent=t;
+async function api(path){
+  const r=await fetch('https://v3.football.api-sports.io'+path,{headers:{'x-apisports-key':KEY}});
+  const j=await r.json(),e=j.errors;
+  if(e&&(Array.isArray(e)?e.length:Object.keys(e).length)) throw new Error(Object.values(e).join(' '));
+  return j;
+}
+const fact=n=>n<2?1:n*fact(n-1),pois=(k,l)=>Math.exp(-l)*Math.pow(l,k)/fact(k);
+const cdf=(k,l)=>{let s=0;for(let i=0;i<=k;i++)s+=pois(i,l);return s};
+const av=(a,b,def)=>{const v=[a,b].filter(x=>x!==null&&x!==undefined);return v.length?v.reduce((x,y)=>x+y)/v.length:def};
+const MX=(a,b)=>{const m=[];for(let i=0;i<=8;i++){m[i]=[];for(let j=0;j<=8;j++)m[i][j]=pois(i,a)*pois(j,b)}return m};
+const sum=(m,f)=>{let s=0;for(let i=0;i<=8;i++)for(let j=0;j<=8;j++)if(f(i,j))s+=m[i][j];return s};
+function analyse(f,p,dp){
+  const pc=p.predictions.percent||{},H=parseInt(pc.home)/100,D=parseInt(pc.draw)/100,A=parseInt(pc.away)/100;
+  if([H,D,A].some(isNaN)) return null;
+  const th=p.teams.home.league||{},ta=p.teams.away.league||{};
+  const g=(t,k,s)=>num(t.goals&&t.goals[k]&&t.goals[k].average&&t.goals[k].average[s]);
+  const lh=av(g(th,'for','home'),g(ta,'against','away'),1.4),la=av(g(ta,'for','away'),g(th,'against','home'),1.1),lt=lh+la;
+  const m=MX(lh,la),hn=f.teams.home.name,an=f.teams.away.name,M=[];
+  const add=(g,n,pr,b)=>M.push({g,n,p:pr,b:b?1:0});
+  add('res',hn+' to win',H,1);add('res',an+' to win',A,1);add('res','Draw',D,1);
+  add('res',hn+' or draw',H+D);add('res',an+' or draw',A+D);add('res',hn+' or '+an+' (no draw)',H+A);
+  add('res',hn+' draw no bet',H/(H+A));add('res',an+' draw no bet',A/(H+A));
+  add('teams',hn+' to win to nil',sum(m,(i,j)=>i>0&&j==0),1);add('teams',an+' to win to nil',sum(m,(i,j)=>j>0&&i==0),1);
+  [0.5,1.5,2.5,3.5,4.5].forEach(L=>{const o=1-cdf(Math.floor(L),lt),b=L==2.5||L==3.5;add('goals','Over '+L+' goals',o,b);add('goals','Under '+L+' goals',1-o,b)});
+  const by=(1-Math.exp(-lh))*(1-Math.exp(-la));add('btts','Both teams to score',by,1);add('btts','Both teams not to score',1-by,1);
+  add('teams','Over 0.5 first-half goals',1-cdf(0,lt*.45));add('teams','Over 1.5 first-half goals',1-cdf(1,lt*.45));
+  [[hn,lh,la],[an,la,lh]].forEach(([n,l,o])=>{[0.5,1.5,2.5].forEach(L=>add('teams',n+' over '+L+' goals',1-cdf(Math.floor(L),l),L==1.5));add('teams',n+' to keep a clean sheet',Math.exp(-o),1)});
+  let ex='';
+  if(dp&&dp.h&&dp.a){
+    const ch=av(dp.h.cf,dp.a.ca,4.5),cx=av(dp.a.cf,dp.h.ca,4.5),ct=ch+cx,kh=av(dp.h.kf,dp.a.ka,2),kx=av(dp.a.kf,dp.h.ka,2),kt=kh+kx;
+    [7.5,8.5,9.5,10.5,11.5,12.5].forEach(L=>{const o=1-cdf(Math.floor(L),ct),b=L==9.5||L==10.5;add('corners','Over '+L+' corners',o,b);add('corners','Under '+L+' corners',1-o,b)});
+    [[hn,ch],[an,cx]].forEach(([n,l])=>[2.5,3.5,4.5,5.5].forEach(L=>{const o=1-cdf(Math.floor(L),l),b=L==3.5||L==4.5;add('corners',n+' over '+L+' corners',o,b);add('corners',n+' under '+L+' corners',1-o,b)}));
+    [2.5,3.5,4.5,5.5,6.5].forEach(L=>{const o=1-cdf(Math.floor(L),kt),b=L==3.5||L==4.5;add('cards','Over '+L+' cards',o,b);add('cards','Under '+L+' cards',1-o,b)});
+    [[hn,kh],[an,kx]].forEach(([n,l])=>[1.5,2.5].forEach(L=>{const o=1-cdf(Math.floor(L),l),b=L==1.5;add('cards',n+' over '+L+' cards',o,b);add('cards',n+' under '+L+' cards',1-o,b)}));
+    ex=' Expected corners '+ct.toFixed(1)+', cards '+kt.toFixed(1)+' (last five games each).';
+  }
+  const grp=[...document.querySelectorAll('.grp:checked')].map(x=>x.value),safe=$('mode').value==='safe';
+  const pool=M.filter(x=>grp.includes(x.g)&&x.p<=.88&&x.p>=.5&&(safe||x.b)).sort((a,b)=>b.p-a.p);
+  if(!pool.length) return null;
+  let bs=[0,0,-1];for(let i=0;i<=8;i++)for(let j=0;j<=8;j++)if(m[i][j]>bs[2])bs=[i,j,m[i][j]];
+  const fm=t=>((t.form||'').slice(-5))||'n/a';
+  return{f,p,dp,pool,all:M.slice().sort((a,b)=>b.p-a.p),prob:pool[0].p,
+    why:'Expected goals '+lh.toFixed(1)+' to '+la.toFixed(1)+', likeliest score '+bs[0]+'-'+bs[1]+'. Last five: '+fm(th)+' (home), '+fm(ta)+' (away).'+ex,
+    adv:p.predictions.advice||''};
+}
+let CUR=[];const SLIP=new Map(),HK='mp_hist',key=(x,n)=>x.id+'|'+n;
+const kind=n=>/corner/i.test(n)?'corners':/card/i.test(n)?'cards':/^Both teams/.test(n)?'btts':/goals|clean sheet|first-half/.test(n)?'goals':'res';
+const bkOf=all=>{const o={};all.filter(y=>y.p>=.5&&y.p<=.88).forEach(y=>{const k=kind(y.n);(o[k]=o[k]||[]).length<3&&o[k].push({n:y.n,p:y.p})});return o};
+const compact=x=>({bk:bkOf(x.all),id:String(x.f.fixture.id),lg:x.f.league.name,h:x.f.teams.home.name,a:x.f.teams.away.name,dt:x.f.fixture.date,src:$('src').value,pool:x.pool.slice(0,4).map(y=>({n:y.n,p:y.p})),all:x.all.slice(0,14).map(y=>({n:y.n,p:y.p})),why:x.why,adv:x.adv||'',prob:x.prob});
+const timeOK=x=>{const t=$('tf').value;if(t==='all')return true;const h=new Date(x.dt).getHours();return t==='am'?h<12:t==='pm'?(h>=12&&h<17):h>=17};
+function render(){
+  const lf=$('lf'),cur=lf.value||'all',lgs=[...new Set(CUR.map(x=>x.lg))].sort();
+  lf.innerHTML='<option value="all">All leagues</option>'+lgs.map(l=>'<option value="'+esc(l)+'">'+esc(l)+'</option>').join('');lf.value=lgs.includes(cur)?cur:'all';
+  const mk=$('mf').value,items=CUR.map(x=>{if(mk==='all')return x;const pl=(x.bk&&x.bk[mk])||[];return pl.length?Object.assign({},x,{pool:pl,prob:pl[0].p}):null}).filter(x=>x&&(lf.value==='all'||x.lg===lf.value)&&timeOK(x)).sort((a,b)=>b.prob-a.prob).slice(0,+$('want').value||8);
+  $('flt').hidden=!CUR.length;lastText='Picks for '+$('date').value+'\n';
+  $('out').innerHTML=items.map((x,i)=>{
+    const b=x.pool[0],pr=Math.round(b.p*100),tier=pr>=70?['Strong','ee']:pr>=60?['Solid','me']:['Lean','ae'],k=key(x,b.n),on=SLIP.has(k);
+    const t=new Date(x.dt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    lastText+=(i+1)+'. '+x.h+' v '+x.a+' ('+t+'): '+b.n+' ('+pr+'%)\n';
+    const alt=x.pool.slice(1,4).map(y=>'<span class="chip2">'+esc(y.n)+' <b>'+Math.round(y.p*100)+'%</b></span>').join('');
+    const rows=x.all.map(y=>{const kk=key(x,y.n);return '<div class="mr'+(SLIP.has(kk)?' on':'')+'" data-k="'+esc(kk)+'" data-l="'+esc(x.h+' v '+x.a+': '+y.n)+'" data-p="'+y.p+'"><span>'+esc(y.n)+'</span><span>'+Math.round(y.p*100)+'%</span></div>'}).join('');
+    return '<div class="'+(i?'card pick':'hero')+'"><div class="mt"><div class="meta">'+(i?'':'Top pick · ')+esc(x.lg)+' · '+t+'</div><button class="sl'+(on?' on':'')+'" data-k="'+esc(k)+'" data-l="'+esc(x.h+' v '+x.a+': '+b.n)+'" data-p="'+b.p+'">'+(on?'In slip':'+ Slip')+'</button></div>'+
+    '<div class="teams">'+esc(x.h)+' v '+esc(x.a)+'</div>'+
+    '<div class="prow"><div class="pl"><div class="pk">'+esc(b.n)+'</div><span class="tag '+tier[1]+'">'+tier[0]+'</span></div><div class="pnum">'+pr+'<small>%</small></div></div>'+
+    '<div class="bar"><i style="width:'+pr+'%"></i></div>'+
+    '<div class="why">'+esc(x.why)+(x.adv?' API note: '+esc(x.adv)+'.':'')+'</div>'+(alt?'<div class="chips">'+alt+'</div>':'')+
+    '<div class="val"><input class="vo" type="number" step="0.01" min="1.01" inputmode="decimal" placeholder="Your odds" data-p="'+b.p+'"><span class="vr"></span></div>'+
+    '<details class="all"><summary>All markets (tap to add to slip)</summary>'+rows+'</details></div>'}).join('')||(CUR.length?'<div class="card">No picks match this filter.</div>':'');
+  $('copy').hidden=$('sh').hidden=!items.length;return items.length;
+}
+function show(list,want,extra,final){
+  CUR=list.map(compact);const n=render();
+  say(n?'Showing the '+n+' strongest of '+list.length+' games checked.'+(extra||''):(list.length?'No picks match this filter.':'No games could be analysed.')+(extra||''));
+  if(final&&CUR.length){try{localStorage.setItem('mp_last',JSON.stringify({at:Date.now(),date:$('date').value,picks:CUR}))}catch(e){}saveHist();renderTrk()}
+}
+/* slip, value finder, share */
+function upSlip(){const n=SLIP.size,c=[...SLIP.values()].reduce((a,v)=>a*v.p,1);$('slip').hidden=!n;$('sn').textContent=n+' pick'+(n>1?'s':'');$('sp').textContent=Math.round(c*100)+'%'}
+function mark(){document.querySelectorAll('[data-k]').forEach(n=>{const on=SLIP.has(n.dataset.k);n.classList.toggle('on',on);if(n.classList.contains('sl'))n.textContent=on?'In slip':'+ Slip'})}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-k]');if(!el)return;const k=el.dataset.k;SLIP.has(k)?SLIP.delete(k):SLIP.set(k,{l:el.dataset.l,p:+el.dataset.p});mark();upSlip()});
+document.addEventListener('input',e=>{const el=e.target;if(!el.classList.contains('vo'))return;const o=parseFloat(el.value),p=+el.dataset.p,r=el.nextElementSibling;
+  if(!(o>1)){r.textContent='';r.className='vr';return}const im=1/o,ed=Math.round((p-im)*100);r.className='vr '+(ed>0?'good':'bad');
+  r.textContent=ed>0?'Value: +'+ed+' pts (odds imply '+Math.round(im*100)+'%)':'No value: odds imply '+Math.round(im*100)+'%'});
+async function share(t){if(navigator.share){try{await navigator.share({title:'Matchday Picks',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(t);say('Copied to clipboard.')}catch(e){say('Could not share from this browser.')}}
+$('sh').onclick=()=>share(lastText);
+$('sshare').onclick=()=>{const v=[...SLIP.values()],c=v.reduce((a,x)=>a*x.p,1);share('My slip ('+v.length+' picks, about '+Math.round(c*100)+'% combined)\n'+v.map((x,i)=>(i+1)+'. '+x.l+' ('+Math.round(x.p*100)+'%)').join('\n'))};
+$('sclr').onclick=()=>{SLIP.clear();mark();upSlip()};
+$('lf').onchange=$('tf').onchange=$('mf').onchange=render;$('want').addEventListener('change',()=>{if(CUR.length)render()});
+/* results tracker */
+const getH=()=>{try{return JSON.parse(localStorage.getItem(HK))||{}}catch(e){return{}}};
+function saveHist(){
+  const d=$('date').value,h=getH(),keep=(h[d]||[]).filter(e=>e.res),have=new Set(keep.map(e=>e.id+'|'+e.n));
+  const add=CUR.slice().sort((a,b)=>b.prob-a.prob).slice(0,+$('want').value||8).map(x=>({id:x.id,src:x.src,lg:x.lg,h:x.h,a:x.a,dt:x.dt,n:x.pool[0].n,p:x.pool[0].p,res:null})).filter(e=>!have.has(e.id+'|'+e.n));
+  h[d]=keep.concat(add);Object.keys(h).sort().slice(0,-30).forEach(k=>delete h[k]);
+  try{localStorage.setItem(HK,JSON.stringify(h))}catch(e){}
+}
+function settle(e,hs,as){
+  const n=e.n,h=e.h,a=e.a,T=hs+as;let m;const W=c=>c?'won':'lost';
+  if(n===h+' to win')return W(hs>as);if(n===a+' to win')return W(as>hs);if(n==='Draw')return W(hs===as);
+  if(n===h+' or draw')return W(hs>=as);if(n===a+' or draw')return W(as>=hs);if(n===h+' or '+a+' (no draw)')return W(hs!==as);
+  if(n===h+' draw no bet')return hs===as?'void':W(hs>as);if(n===a+' draw no bet')return hs===as?'void':W(as>hs);
+  if(n===h+' to win to nil')return W(hs>as&&as===0);if(n===a+' to win to nil')return W(as>hs&&hs===0);
+  if(n===h+' to keep a clean sheet')return W(as===0);if(n===a+' to keep a clean sheet')return W(hs===0);
+  if(n==='Both teams to score')return W(hs>0&&as>0);if(n==='Both teams not to score')return W(hs===0||as===0);
+  if(m=n.match(/^(Over|Under) ([\d.]+) goals$/))return W(m[1]==='Over'?T>+m[2]:T<+m[2]);
+  if(n.startsWith(h+' ')&&(m=n.slice(h.length+1).match(/^(over|under) ([\d.]+) goals$/)))return W(m[1]==='over'?hs>+m[2]:hs<+m[2]);
+  if(n.startsWith(a+' ')&&(m=n.slice(a.length+1).match(/^(over|under) ([\d.]+) goals$/)))return W(m[1]==='over'?as>+m[2]:as<+m[2]);
+  return null;
+}
+async function espnScores(d){
+  const ds=d.replace(/-/g,''),map={};
+  const rs=await Promise.allSettled(ESPN2.map(([s])=>fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/'+s+'/scoreboard?dates='+ds).then(r=>{if(!r.ok)throw 0;return r.json()})));
+  rs.forEach(r=>{if(r.status!=='fulfilled')return;(r.value.events||[]).forEach(e=>{const c=(e.competitions||[])[0];if(!c)return;
+    const st=((e.status||c.status||{}).type||{}),h=(c.competitors||[]).find(x=>x.homeAway==='home'),a=(c.competitors||[]).find(x=>x.homeAway==='away');
+    if(h&&a)map[String(e.id)]={done:!!st.completed,hs:parseInt(h.score),as:parseInt(a.score)}})});
+  return map;
+}
+async function checkResults(){
+  const h=getH(),dates=Object.keys(h).filter(d=>h[d].some(e=>!e.res));let miss=0,got=0;
+  if(!dates.length){say('Nothing waiting to be checked.');return}
+  $('tchk').disabled=true;
+  try{
+    for(const d of dates){
+      const pend=h[d].filter(e=>!e.res),map={};
+      if(pend.some(e=>e.src==='espn')){say('Checking ESPN results for '+d+'…');Object.assign(map,await espnScores(d))}
+      const ap=pend.filter(e=>e.src==='api');
+      if(ap.length){KEY=$('key').value.trim();
+        if(!KEY)miss+=ap.length;else{const ids=[...new Set(ap.map(e=>e.id))];
+          for(let i=0;i<ids.length;i+=20){say('Checking API-Football results for '+d+'…');
+            const r=(await api('/fixtures?ids='+ids.slice(i,i+20).join('-'))).response||[];
+            r.forEach(f=>{const ft=f.score&&f.score.fulltime;if(['FT','AET','PEN'].includes(f.fixture.status.short)&&ft&&ft.home!==null)map[String(f.fixture.id)]={done:true,hs:ft.home,as:ft.away}});
+            await sleep(+$('pace').value)}}}
+      pend.forEach(e=>{const g=map[e.id];if(g&&g.done&&!isNaN(g.hs)&&!isNaN(g.as)){e.res=settle(e,g.hs,g.as)||'na';e.sc=g.hs+'-'+g.as;got++}});
+    }
+    try{localStorage.setItem(HK,JSON.stringify(h))}catch(e){}
+    say(got+' result'+(got===1?'':'s')+' updated.'+(miss?' '+miss+' API-Football pick'+(miss>1?'s':'')+' need your key to be checked.':''));renderTrk();
+  }catch(e){say('Could not check results: '+e.message)}finally{$('tchk').disabled=false}
+}
+function renderTrk(){
+  const h=getH(),all=Object.keys(h).sort().reverse().flatMap(d=>h[d].map(e=>Object.assign({d},e)));
+  if(!all.length){$('trkb').innerHTML='<div class="nt" style="margin:10px 0">No picks tracked yet. Your top picks are saved each time games load, then Check results marks them won or lost.</div>';return}
+  const c=k=>all.filter(e=>e.res===k).length,w=c('won'),l=c('lost'),v=c('void'),na=c('na'),pe=all.filter(e=>!e.res).length;
+  const grp=e=>/Over|Under|Both teams|clean sheet|to nil/.test(e.n)?'goals':'res',rate=(g)=>{const x=all.filter(e=>grp(e)===g&&(e.res==='won'||e.res==='lost')),y=x.filter(e=>e.res==='won').length;return x.length?y+' of '+x.length+' ('+Math.round(y/x.length*100)+'%)':'none yet'};
+  const ic={won:'✓',lost:'✗',void:'↺',na:'–'};
+  $('trkb').innerHTML='<div class="tiles3"><div class="tt"><b>'+w+'–'+l+'</b><small>Won–lost</small></div><div class="tt"><b>'+(w+l?Math.round(w/(w+l)*100)+'%':'–')+'</b><small>Hit rate</small></div><div class="tt"><b>'+pe+'</b><small>Waiting</small></div></div>'+
+    '<div class="nt">Result markets: '+rate('res')+'. Goals markets: '+rate('goals')+'.'+(v||na?' '+v+' void, '+na+' not checkable (corners, cards, first half).':'')+'</div>'+
+    all.slice(0,15).map(e=>'<div class="tr2"><span>'+(ic[e.res]||'○')+' '+esc(e.h)+' v '+esc(e.a)+'<br><small>'+esc(e.n)+' · '+Math.round(e.p*100)+'%'+(e.sc?' · '+e.sc:'')+'</small></span><span><small>'+e.d+'</small></span></div>').join('');
+}
+$('tchk').onclick=checkResults;
+$('tclr').onclick=()=>{if(confirm('Clear all tracked picks?')){try{localStorage.removeItem(HK)}catch(e){}renderTrk()}};
+/* ESPN (no key): games from ESPN's public scoreboard, chances from bookmaker odds */
+const ESPN=[['eng.1','Premier League'],['esp.1','La Liga'],['ita.1','Serie A'],['ger.1','Bundesliga'],['fra.1','Ligue 1'],['uefa.champions','Champions League'],['uefa.europa','Europa League'],['uefa.europa.conf','Conference League'],['eng.2','Championship'],['ned.1','Eredivisie'],['por.1','Primeira Liga'],['ken.1','Kenyan Premier League'],['uefa.nations','Nations League']];
+const ESPN2=ESPN.concat([['usa.1','MLS'],['mex.1','Liga MX'],['bra.1','Brazilian Serie A'],['arg.1','Argentine Liga'],['tur.1','Turkish Super Lig'],['sco.1','Scottish Premiership'],['bel.1','Belgian Pro League'],['eng.3','League One'],['ger.2','2. Bundesliga'],['esp.2','La Liga 2'],['ita.2','Serie B'],['fra.2','Ligue 2'],['eng.fa','FA Cup'],['eng.league_cup','EFL Cup'],['esp.copa_del_rey','Copa del Rey'],['ger.dfb_pokal','DFB Pokal'],['ita.coppa_italia','Coppa Italia'],['fra.coupe_de_france','Coupe de France'],['conmebol.libertadores','Copa Libertadores'],['conmebol.sudamericana','Copa Sudamericana'],['rsa.1','South African Premiership'],['gre.1','Greek Super League'],['aus.1','A-League'],['jpn.1','J1 League']]);
+const imp=v=>{if(v&&typeof v==='object')v=v.moneyLine!==undefined?v.moneyLine:(v.odds!==undefined?v.odds:v.american);if(v===undefined||v===null)return null;
+  let s=String(v).trim().toUpperCase();if(s==='EVEN')s='100';const n=parseFloat(s.replace('+',''));if(isNaN(n)||n===0)return null;return n>0?100/(n+100):(-n)/(-n+100)};
+function oddsOf(od){if(!od)return null;
+  const m=od.moneyline||{},pick=k=>m[k]&&(m[k].close||m[k].open||m[k].current),
+    h=imp(od.homeTeamOdds)??imp(pick('home')),d=imp(od.drawOdds)??imp(pick('draw')),a=imp(od.awayTeamOdds)??imp(pick('away'));
+  return(h&&d&&a)?[h,d,a]:null}
+function analyseOdds(f,od){
+  const o=oddsOf(od);if(!o)return null;const s=o[0]+o[1]+o[2],H=o[0]/s,D=o[1]/s,A=o[2]/s,hn=f.teams.home.name,an=f.teams.away.name,M=[];
+  const add=(n,p,b)=>M.push({g:'res',n,p,b:b?1:0});
+  add(hn+' to win',H,1);add(an+' to win',A,1);add('Draw',D,1);add(hn+' or draw',H+D);add(an+' or draw',A+D);add(hn+' or '+an+' (no draw)',H+A);add(hn+' draw no bet',H/(H+A));add(an+' draw no bet',A/(H+A));
+  const safe=$('mode').value==='safe',pool=M.filter(x=>x.p<=.88&&x.p>=.5&&(safe||x.b)).sort((a,b)=>b.p-a.p);
+  if(!pool.length)return null;
+  return{f,pool,all:M.slice().sort((a,b)=>b.p-a.p),prob:pool[0].p,why:'From bookmaker odds with the bookmaker margin removed: home '+Math.round(H*100)+'%, draw '+Math.round(D*100)+'%, away '+Math.round(A*100)+'%.',adv:''};
+}
+async function runEspn(cap){
+  say('Loading games from ESPN…');const ds=$('date').value.replace(/-/g,'');
+  const rs=await Promise.allSettled(($('top').checked?ESPN:ESPN2).map(([s,n])=>fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/'+s+'/scoreboard?dates='+ds).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>({n,j}))));
+  const ok=rs.filter(r=>r.status==='fulfilled').map(r=>r.value);
+  if(!ok.length)throw new Error('ESPN could not be reached from this browser');
+  let games=[];
+  ok.forEach(({n,j})=>(j.events||[]).forEach(e=>{const c=(e.competitions||[])[0];if(!c)return;
+    const st=((e.status||c.status||{}).type||{});if(st.state!=='pre')return;if(ymd(new Date(e.date))!==$('date').value)return;
+    const h=(c.competitors||[]).find(x=>x.homeAway==='home'),a=(c.competitors||[]).find(x=>x.homeAway==='away');if(!h||!a)return;
+    games.push({f:{fixture:{id:e.id,date:e.date},league:{name:(j.leagues&&j.leagues[0]&&j.leagues[0].name)||n},teams:{home:{name:h.team.displayName},away:{name:a.team.displayName}}},od:(c.odds||[])[0]})}));
+  games=games.slice(0,cap);
+  if(!games.length){say('ESPN lists no upcoming games in its tracked leagues for that date. Try another date.');return null}
+  const res=[];let none=0;games.forEach(g=>{const a=analyseOdds(g.f,g.od);a?res.push(a):none++});
+  return{res,extra:none?' '+none+' game'+(none>1?'s':'')+' had no odds on ESPN or no pick in range, so '+(none>1?'were':'was')+' skipped.':''};
+}
+async function teamStats(id,pace){
+  const l=(await api('/fixtures?team='+id+'&last=5')).response,ids=l.map(x=>x.fixture.id).join('-');
+  if(!ids) return null;
+  await sleep(pace);
+  const s=(await api('/fixtures?ids='+ids)).response,t={cf:[],ca:[],kf:[],ka:[]};
+  const val=(e,k)=>{const x=e&&e.statistics.find(y=>y.type===k);return x&&x.value?+x.value:0};
+  s.forEach(fx=>{const st=fx.statistics||[],me=st.find(e=>e.team.id===id),op=st.find(e=>e.team.id!==id);
+    if(!me||!op) return;
+    t.cf.push(val(me,'Corner Kicks'));t.ca.push(val(op,'Corner Kicks'));
+    t.kf.push(val(me,'Yellow Cards')+val(me,'Red Cards'));t.ka.push(val(op,'Yellow Cards')+val(op,'Red Cards'))});
+  if(t.cf.length<3) return null;
+  const a=x=>x.reduce((p,q)=>p+q,0)/x.length;
+  return{cf:a(t.cf),ca:a(t.ca),kf:a(t.kf),ka:a(t.ka)};
+}
+const sync=()=>{const e=$('src').value==='espn';['kw','key','pw','pace','dw','mw','mwl'].forEach(i=>$(i).style.display=e?'none':'');$('pnote').textContent=e?'ESPN mode gives result picks only. Switch to API-Football in Setup for goals, BTTS, corners and cards.':'';$('srcnote').textContent=e?'No key needed. Uses ESPN’s public scoreboard and bookmaker odds, so result picks only. Over/under goals, BTTS, corners and cards need API-Football. Untick “Major leagues” to include about 25 more leagues.':'Uses your API-Football key: results, goals and optional corners and cards.'};
+try{$('src').value=localStorage.getItem('mp_src')||($('key').value.trim()?'api':'espn')}catch(e){}
+$('src').onchange=()=>{try{localStorage.setItem('mp_src',$('src').value)}catch(e){}sync()};sync();
+$('go').onclick=async()=>{
+  const esp=$('src').value==='espn';KEY=$('key').value.trim();
+  if(!esp&&!KEY){say('Paste your API-Football key first.');return}
+  try{localStorage.setItem('mp_key',KEY)}catch(e){}
+  const want=+$('want').value||8,cap=+$('cap').value||20,pace=+$('pace').value,tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+  $('go').disabled=true;$('out').innerHTML='';$('copy').hidden=true;
+  try{
+    if(esp){const r=await runEspn(cap);if(r)show(r.res,want,r.extra,true);return}
+    say('Loading fixtures…');
+    let fx=(await api('/fixtures?date='+$('date').value+'&timezone='+encodeURIComponent(tz))).response
+      .filter(f=>['NS','TBD'].includes(f.fixture.status.short)&&(!$('top').checked||TOP.includes(f.league.id)));
+    const rank=f=>{const i=TOP.indexOf(f.league.id);return i<0?99:i};
+    fx=fx.sort((a,b)=>rank(a)-rank(b)).slice(0,cap);
+    if(!fx.length){say('No upcoming games found for that date. Try another date or untick the leagues filter.');return}
+    let res=[];
+    for(let i=0;i<fx.length;i++){
+      say('Checking game '+(i+1)+' of '+fx.length+': '+fx[i].teams.home.name+' v '+fx[i].teams.away.name);
+      try{const p=(await api('/predictions?fixture='+fx[i].fixture.id)).response[0];const a=p&&analyse(fx[i],p);if(a)res.push(a)}
+      catch(e){if(/limit|quota/i.test(e.message)){say('Request limit reached. Showing what was checked so far.');break}}
+      if(res.length&&i%3===2)show(res,want);
+      await sleep(pace);
+    }
+    if($('deep').checked&&res.length){
+      res.sort((a,b)=>b.prob-a.prob);
+      const n=Math.min(want,res.length);
+      for(let i=0;i<n;i++){
+        say('Deep check '+(i+1)+' of '+n+': corners and cards for '+res[i].f.teams.home.name+' v '+res[i].f.teams.away.name);
+        try{
+          const h=await teamStats(res[i].f.teams.home.id,pace);await sleep(pace);
+          const a=await teamStats(res[i].f.teams.away.id,pace);await sleep(pace);
+          const r2=analyse(res[i].f,res[i].p,{h,a});if(r2)res[i]=r2;
+        }catch(e){if(/limit|quota/i.test(e.message)){say('Request limit reached during the deep check.');break}}
+      }
+    }
+    show(res,want,'',true);
+  }catch(e){say('Could not load data: '+e.message+(esp?'':' (check your key and internet connection).'))}
+  finally{$('go').disabled=false}
+};
+$('copy').onclick=()=>{navigator.clipboard.writeText(lastText).then(()=>say('Picks copied.'))};
+/* live games */
+let APL=[],liveT=null;
+async function espnLive(){
+  const ds=ymd(new Date()).replace(/-/g,''),out=[];
+  const rs=await Promise.allSettled(ESPN2.map(([sl,n])=>fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/'+sl+'/scoreboard?dates='+ds).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>({n,j}))));
+  if(!rs.some(r=>r.status==='fulfilled'))throw new Error('ESPN could not be reached');
+  rs.forEach(r=>{if(r.status!=='fulfilled')return;const{n,j}=r.value;(j.events||[]).forEach(e=>{const c=(e.competitions||[])[0];if(!c)return;
+    const st=e.status||c.status||{},t=st.type||{},h=(c.competitors||[]).find(x=>x.homeAway==='home'),a=(c.competitors||[]).find(x=>x.homeAway==='away');if(!h||!a)return;
+    out.push({id:String(e.id),lg:(j.leagues&&j.leagues[0]&&j.leagues[0].name)||n,h:h.team.displayName,a:a.team.displayName,hs:parseInt(h.score)||0,as:parseInt(a.score)||0,state:t.state,clock:t.shortDetail||st.displayClock||'',o:oddsOf((c.odds||[])[0])})})});
+  return out;
+}
+async function apiLive(ids){
+  const out=[];for(let i=0;i<ids.length;i+=20){const r=(await api('/fixtures?ids='+ids.slice(i,i+20).join('-'))).response||[];
+    r.forEach(f=>{const sh=f.fixture.status.short,live=['1H','2H','HT','ET','BT','P','LIVE'].includes(sh),done=['FT','AET','PEN'].includes(sh);
+      out.push({id:String(f.fixture.id),lg:f.league.name,h:f.teams.home.name,a:f.teams.away.name,hs:f.goals.home||0,as:f.goals.away||0,state:live?'in':done?'post':'pre',clock:live?(f.fixture.status.elapsed||'')+"'":sh,o:null})})}
+  return out;
+}
+function renderLive(list){
+  const lv=list.filter(x=>x.state==='in'),mine=(getH()[ymd(new Date())]||[]);let h='';
+  h+='<div class="sec2">Live now ('+lv.length+')</div>'+(lv.map(x=>{const o=x.o,sm=o?o[0]+o[1]+o[2]:0;
+    return '<div class="tr2"><span><small>'+esc(x.lg)+' · '+esc(x.clock)+'</small><br><b>'+esc(x.h)+' '+x.hs+'–'+x.as+' '+esc(x.a)+'</b>'+(o?'<br><small>Live chances: home '+Math.round(o[0]/sm*100)+'% · draw '+Math.round(o[1]/sm*100)+'% · away '+Math.round(o[2]/sm*100)+'%</small>':'')+'</span></div>'}).join('')||'<div class="nt">No games live right now in the leagues ESPN tracks here.</div>');
+  if(mine.length){h+='<div class="sec2">Your picks today</div>'+mine.map(e=>{const g=list.find(x=>x.id===e.id);let st='Not found yet';
+    if(g){if(g.state==='pre')st='○ Not started';else{const r=settle(e,g.hs,g.as),fin=g.state==='post';st=r==='won'?(fin?'✓ Won':'✓ On course'):r==='lost'?(fin?'✗ Lost':'✗ Not on course'):r==='void'?'↺ Void':'– Not checkable live';st+=' · '+g.hs+'–'+g.as+(g.state==='in'?' ('+esc(g.clock)+')':'')}}
+    return '<div class="tr2"><span>'+esc(e.h)+' v '+esc(e.a)+'<br><small>'+esc(e.n)+'</small></span><span><small>'+st+'</small></span></div>'}).join('')}
+  $('lbody').innerHTML=h;
+}
+async function refreshLive(manual){
+  try{
+    const list=await espnLive(),pend=(getH()[ymd(new Date())]||[]).filter(e=>e.src==='api');
+    if(manual&&pend.length){if($('key').value.trim()){KEY=$('key').value.trim();try{APL=await apiLive([...new Set(pend.map(e=>e.id))])}catch(e){}}}
+    renderLive(list.concat(APL.filter(x=>!list.some(y=>y.id===x.id))));
+  }catch(e){$('lbody').innerHTML='<div class="nt">'+esc(e.message)+'. Try again in a moment.</div>'}
+}
+function tab(t){document.querySelectorAll('.tab').forEach(x=>x.hidden=x.id!=='t-'+t);document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));clearInterval(liveT);
+  if(t==='live'){refreshLive(false);liveT=setInterval(()=>{if(document.visibilityState==='visible')refreshLive(false)},60000)}
+  try{localStorage.setItem('mp_tab',t)}catch(e){}window.scrollTo(0,0)}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+$('lrf').onclick=()=>refreshLive(true);
+/* bookmaker odds checker */
+$('mgo').onclick=()=>{
+  const o=[+$('o1').value,+$('ox').value,+$('o2').value],hn=$('mh').value.trim()||'Home',an=$('ma').value.trim()||'Away';
+  if(o.some(v=>!(v>1))){$('mres').innerHTML='<div class="nt" style="margin-top:10px">Enter all three odds (1, X and 2) as decimals, like 1.85.</div>';return}
+  const iv=o.map(v=>1/v),sm=iv[0]+iv[1]+iv[2],P=iv.map(v=>v/sm),[H,D,A]=P,id='man|'+hn+'|'+an;
+  const rows=[[hn+' to win',H,o[0]],['Draw',D,o[1]],[an+' to win',A,o[2]],[hn+' or draw',H+D],[an+' or draw',A+D],[hn+' or '+an+' (no draw)',H+A],[hn+' draw no bet',H/(H+A)],[an+' draw no bet',A/(H+A)]];
+  $('mres').innerHTML='<div class="nt" style="margin:10px 0">Bookmaker margin: '+((sm-1)*100).toFixed(1)+'%. Tap a line to add it to your slip.</div>'+rows.map(r=>'<div class="tr2 mr" data-k="'+esc(id+'|'+r[0])+'" data-l="'+esc(hn+' v '+an+': '+r[0])+'" data-p="'+r[1]+'"><span><span class="mk0">'+esc(r[0])+'</span><br><small>Fair odds '+(1/r[1]).toFixed(2)+(r[2]?' · bookmaker '+r[2].toFixed(2):'')+'</small></span><span><b>'+Math.round(r[1]*100)+'%</b></span></div>').join('');
+  mark();
+};
+try{const t0=localStorage.getItem('mp_tab');if(t0&&t0!=='picks')tab(t0)}catch(e){}
+renderTrk();
+try{const sv=JSON.parse(localStorage.getItem('mp_last')||'null');if(sv&&sv.picks&&sv.picks.length){CUR=sv.picks;render();say('Showing saved picks from '+new Date(sv.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'})+($('src').value==='espn'?'. Refreshing…':'. Tap Find picks to refresh.'))}}catch(e){}
+if($('src').value==='espn')$('go').click();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
