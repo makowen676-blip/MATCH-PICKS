@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Matchday Picks</title>
+<style>
+:root{--bg:#f2f5f3;--ink:#10222b;--mut:#5b6b72;--line:#d3dcd8;--card:#fff;--acc:#0e7c6e;--hi:#0e7c6e;--mid:#a97400;--lo:#a8372b;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1a20;--ink:#e8f0ee;--mut:#98aab1;--line:#243740;--card:#142630;--acc:#3cc2ae;--hi:#3cc2ae;--mid:#e0a526;--lo:#ef7a6c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.7rem;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:flex;flex-direction:column;font-size:.85rem;color:var(--mut);gap:4px}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px}
+.wide{grid-column:1/-1}.chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink)}.chk input{width:auto}
+button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:12px;background:var(--acc);color:#fff;cursor:pointer}
+@media(prefers-color-scheme:dark){button{color:#06201b}}
+button:disabled{opacity:.5}button.ghost{background:transparent;color:var(--acc);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#msg{margin:14px 0;color:var(--mut);min-height:1.4em}
+.pick{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:0 0 10px}
+.meta{font-size:.8rem;color:var(--mut)}
+.teams{font-weight:600;font-size:1.05rem;margin:2px 0 8px}
+.line{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.bar{height:8px;border-radius:4px;background:var(--line);margin:6px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%}
+.why{font-size:.86rem;color:var(--mut)}
+details{border:1px solid var(--line);border-radius:6px;padding:8px 10px}summary{cursor:pointer;color:var(--mut)}.grid2{display:grid;gap:8px;margin-top:10px}.alt{font-size:.84rem;margin-top:6px}.all{margin-top:8px;font-size:.84rem}.all div{display:flex;justify-content:space-between;padding:2px 0}
+.note{font-size:.8rem;color:var(--mut);margin-top:18px}
+</style></head><body><main>
+<h1>Matchday picks</h1>
+<p class="sub">Reads the day’s fixtures, checks each game’s data, and gives you the strongest picks.</p>
+<div class="panel">
+<label class="wide">API-Football key<input id="key" type="password" autocomplete="off" placeholder="Paste your key"></label>
+<label>Date<input id="date" type="date"></label>
+<label>How many picks do you want?<input id="want" type="number" min="1" max="30" value="8"></label>
+<label>Style<select id="mode"><option value="safe">Safe (highest chance)</option><option value="bold">Bold (wins and goals only)</option></select></label>
+<label>Games to check<input id="cap" type="number" min="1" max="60" value="20"></label>
+<label>Plan speed<select id="pace"><option value="6500">Free plan (slow)</option><option value="500">Paid plan (fast)</option></select></label>
+<label class="chk wide"><input id="top" type="checkbox" checked>Major leagues, Nations League and KPL only</label>
+<details class="wide"><summary>Markets to include</summary>
+<div class="grid2"><label class="chk"><input class="grp" type="checkbox" value="res" checked>Result and handicaps</label>
+<label class="chk"><input class="grp" type="checkbox" value="goals" checked>Total goals and BTTS</label>
+<label class="chk"><input class="grp" type="checkbox" value="teams" checked>Team goals and clean sheets</label>
+<label class="chk"><input class="grp" type="checkbox" value="corners" checked>Corners</label>
+<label class="chk"><input class="grp" type="checkbox" value="cards" checked>Cards</label></div></details>
+<label class="chk wide"><input id="deep" type="checkbox">Check corners and cards too (about 4 extra requests per pick)</label>
+<button id="go" class="wide">Find picks</button>
+</div>
+<div id="msg" role="status"></div>
+<div id="out"></div>
+<button id="copy" class="ghost" hidden>Copy picks</button>
+<p class="note">Picks come from API-Football’s win chances plus a goals model built from each team’s scoring averages. They are estimates, not certainties. Picks above 88% are skipped because the odds on them are usually tiny. Corners and cards need the deep check. Bet only what you can afford to lose.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const TOP=[39,140,135,78,61,2,3,848,5,276,40,88,94,203,179];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>{const n=parseFloat(v);return isNaN(n)?null:n};
+let KEY='',lastText='';
+try{$('key').value=localStorage.getItem('mp_key')||''}catch(e){}
+const d=new Date();$('date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const say=t=>$('msg').textContent=t;
+async function api(path){
+  const r=await fetch('https://v3.football.api-sports.io'+path,{headers:{'x-apisports-key':KEY}});
+  const j=await r.json(),e=j.errors;
+  if(e&&(Array.isArray(e)?e.length:Object.keys(e).length)) throw new Error(Object.values(e).join(' '));
+  return j;
+}
+const fact=n=>n<2?1:n*fact(n-1),pois=(k,l)=>Math.exp(-l)*Math.pow(l,k)/fact(k);
+const cdf=(k,l)=>{let s=0;for(let i=0;i<=k;i++)s+=pois(i,l);return s};
+const av=(a,b,def)=>{const v=[a,b].filter(x=>x!==null&&x!==undefined);return v.length?v.reduce((x,y)=>x+y)/v.length:def};
+const MX=(a,b)=>{const m=[];for(let i=0;i<=8;i++){m[i]=[];for(let j=0;j<=8;j++)m[i][j]=pois(i,a)*pois(j,b)}return m};
+const sum=(m,f)=>{let s=0;for(let i=0;i<=8;i++)for(let j=0;j<=8;j++)if(f(i,j))s+=m[i][j];return s};
+function analyse(f,p,dp){
+  const pc=p.predictions.percent||{},H=parseInt(pc.home)/100,D=parseInt(pc.draw)/100,A=parseInt(pc.away)/100;
+  if([H,D,A].some(isNaN)) return null;
+  const th=p.teams.home.league||{},ta=p.teams.away.league||{};
+  const g=(t,k,s)=>num(t.goals&&t.goals[k]&&t.goals[k].average&&t.goals[k].average[s]);
+  const lh=av(g(th,'for','home'),g(ta,'against','away'),1.4),la=av(g(ta,'for','away'),g(th,'against','home'),1.1),lt=lh+la;
+  const m=MX(lh,la),hn=f.teams.home.name,an=f.teams.away.name,M=[];
+  const add=(g,n,pr,b)=>M.push({g,n,p:pr,b:b?1:0});
+  add('res',hn+' to win',H,1);add('res',an+' to win',A,1);add('res','Draw',D,1);
+  add('res',hn+' or draw',H+D);add('res',an+' or draw',A+D);add('res',hn+' or '+an+' (no draw)',H+A);
+  add('res',hn+' draw no bet',H/(H+A));add('res',an+' draw no bet',A/(H+A));
+  add('res',hn+' wins by 2 or more',sum(m,(i,j)=>i-j>=2),1);add('res',an+' wins by 2 or more',sum(m,(i,j)=>j-i>=2),1);
+  add('res',hn+' +1 handicap',sum(m,(i,j)=>i-j>=-1));add('res',an+' +1 handicap',sum(m,(i,j)=>j-i>=-1));
+  add('res',hn+' to win to nil',sum(m,(i,j)=>i>0&&j==0),1);add('res',an+' to win to nil',sum(m,(i,j)=>j>0&&i==0),1);
+  [0.5,1.5,2.5,3.5,4.5].forEach(L=>{const o=1-cdf(Math.floor(L),lt),b=L==2.5||L==3.5;add('goals','Over '+L+' goals',o,b);add('goals','Under '+L+' goals',1-o,b)});
+  const by=(1-Math.exp(-lh))*(1-Math.exp(-la));add('goals','Both teams to score',by,1);add('goals','Both teams not to score',1-by,1);
+  add('goals','Over 0.5 first-half goals',1-cdf(0,lt*.45));add('goals','Over 1.5 first-half goals',1-cdf(1,lt*.45));
+  [[hn,lh,la],[an,la,lh]].forEach(([n,l,o])=>{[0.5,1.5,2.5].forEach(L=>add('teams',n+' over '+L+' goals',1-cdf(Math.floor(L),l),L==1.5));add('teams',n+' to keep a clean sheet',Math.exp(-o),1)});
+  let ex='';
+  if(dp&&dp.h&&dp.a){
+    const ch=av(dp.h.cf,dp.a.ca,4.5),cx=av(dp.a.cf,dp.h.ca,4.5),ct=ch+cx,kh=av(dp.h.kf,dp.a.ka,2),kx=av(dp.a.kf,dp.h.ka,2),kt=kh+kx;
+    [7.5,8.5,9.5,10.5,11.5,12.5].forEach(L=>{const o=1-cdf(Math.floor(L),ct),b=L==9.5||L==10.5;add('corners','Over '+L+' corners',o,b);add('corners','Under '+L+' corners',1-o,b)});
+    [[hn,ch],[an,cx]].forEach(([n,l])=>[2.5,3.5,4.5,5.5].forEach(L=>{const o=1-cdf(Math.floor(L),l),b=L==3.5||L==4.5;add('corners',n+' over '+L+' corners',o,b);add('corners',n+' under '+L+' corners',1-o,b)}));
+    [2.5,3.5,4.5,5.5,6.5].forEach(L=>{const o=1-cdf(Math.floor(L),kt),b=L==3.5||L==4.5;add('cards','Over '+L+' cards',o,b);add('cards','Under '+L+' cards',1-o,b)});
+    [[hn,kh],[an,kx]].forEach(([n,l])=>[1.5,2.5].forEach(L=>{const o=1-cdf(Math.floor(L),l),b=L==1.5;add('cards',n+' over '+L+' cards',o,b);add('cards',n+' under '+L+' cards',1-o,b)}));
+    ex=' Expected corners '+ct.toFixed(1)+', cards '+kt.toFixed(1)+' (last five games each).';
+  }
+  const grp=[...document.querySelectorAll('.grp:checked')].map(x=>x.value),safe=$('mode').value==='safe';
+  const pool=M.filter(x=>grp.includes(x.g)&&x.p<=.88&&x.p>=.5&&(safe||x.b)).sort((a,b)=>b.p-a.p);
+  if(!pool.length) return null;
+  let bs=[0,0,-1];for(let i=0;i<=8;i++)for(let j=0;j<=8;j++)if(m[i][j]>bs[2])bs=[i,j,m[i][j]];
+  const fm=t=>((t.form||'').slice(-5))||'n/a';
+  return{f,p,dp,pool,all:M.slice().sort((a,b)=>b.p-a.p),prob:pool[0].p,
+    why:'Expected goals '+lh.toFixed(1)+' to '+la.toFixed(1)+', likeliest score '+bs[0]+'-'+bs[1]+'. Last five: '+fm(th)+' (home), '+fm(ta)+' (away).'+ex,
+    adv:p.predictions.advice||''};
+}
+function show(list,want){
+  const top=list.slice().sort((a,b)=>b.prob-a.prob).slice(0,want);
+  lastText='Picks for '+$('date').value+'\n';
+  $('out').innerHTML=top.map((x,i)=>{
+    const b=x.pool[0],pr=Math.round(b.p*100),c=pr>=70?'var(--hi)':pr>=55?'var(--mid)':'var(--lo)';
+    const t=new Date(x.f.fixture.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    lastText+=(i+1)+'. '+x.f.teams.home.name+' v '+x.f.teams.away.name+' ('+t+'): '+b.n+' ('+pr+'%)\n';
+    const alt=x.pool.slice(1,3).map(y=>esc(y.n)+' ('+Math.round(y.p*100)+'%)').join(', ');
+    return '<div class="pick"><div class="meta">'+esc(x.f.league.name)+', '+t+'</div><div class="teams">'+esc(x.f.teams.home.name)+' v '+esc(x.f.teams.away.name)+'</div>'+
+    '<div class="line"><span>'+esc(b.n)+'</span><span>'+pr+'%</span></div><div class="bar"><i style="width:'+pr+'%;background:'+c+'"></i></div>'+
+    '<div class="why">'+esc(x.why)+(x.adv?' API note: '+esc(x.adv)+'.':'')+'</div>'+(alt?'<div class="alt">Also strong: '+alt+'</div>':'')+
+    '<details class="all"><summary>All markets for this game</summary>'+x.all.map(y=>'<div><span>'+esc(y.n)+'</span><span>'+Math.round(y.p*100)+'%</span></div>').join('')+'</details></div>';}).join('');
+  $('copy').hidden=!top.length;
+  say(top.length?'Showing the '+top.length+' strongest of '+list.length+' games checked.':'No games could be analysed.');
+}
+async function teamStats(id,pace){
+  const l=(await api('/fixtures?team='+id+'&last=5')).response,ids=l.map(x=>x.fixture.id).join('-');
+  if(!ids) return null;
+  await sleep(pace);
+  const s=(await api('/fixtures?ids='+ids)).response,t={cf:[],ca:[],kf:[],ka:[]};
+  const val=(e,k)=>{const x=e&&e.statistics.find(y=>y.type===k);return x&&x.value?+x.value:0};
+  s.forEach(fx=>{const st=fx.statistics||[],me=st.find(e=>e.team.id===id),op=st.find(e=>e.team.id!==id);
+    if(!me||!op) return;
+    t.cf.push(val(me,'Corner Kicks'));t.ca.push(val(op,'Corner Kicks'));
+    t.kf.push(val(me,'Yellow Cards')+val(me,'Red Cards'));t.ka.push(val(op,'Yellow Cards')+val(op,'Red Cards'))});
+  if(t.cf.length<3) return null;
+  const a=x=>x.reduce((p,q)=>p+q,0)/x.length;
+  return{cf:a(t.cf),ca:a(t.ca),kf:a(t.kf),ka:a(t.ka)};
+}
+$('go').onclick=async()=>{
+  KEY=$('key').value.trim();if(!KEY){say('Paste your API-Football key first.');return}
+  try{localStorage.setItem('mp_key',KEY)}catch(e){}
+  const want=+$('want').value||8,cap=+$('cap').value||20,pace=+$('pace').value,tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+  $('go').disabled=true;$('out').innerHTML='';$('copy').hidden=true;
+  try{
+    say('Loading fixtures…');
+    let fx=(await api('/fixtures?date='+$('date').value+'&timezone='+encodeURIComponent(tz))).response
+      .filter(f=>['NS','TBD'].includes(f.fixture.status.short)&&(!$('top').checked||TOP.includes(f.league.id)));
+    const rank=f=>{const i=TOP.indexOf(f.league.id);return i<0?99:i};
+    fx=fx.sort((a,b)=>rank(a)-rank(b)).slice(0,cap);
+    if(!fx.length){say('No upcoming games found for that date. Try another date or untick the leagues filter.');return}
+    let res=[];
+    for(let i=0;i<fx.length;i++){
+      say('Checking game '+(i+1)+' of '+fx.length+': '+fx[i].teams.home.name+' v '+fx[i].teams.away.name);
+      try{const p=(await api('/predictions?fixture='+fx[i].fixture.id)).response[0];const a=p&&analyse(fx[i],p);if(a)res.push(a)}
+      catch(e){if(/limit|quota/i.test(e.message)){say('Request limit reached. Showing what was checked so far.');break}}
+      if(res.length&&i%3===2)show(res,want);
+      await sleep(pace);
+    }
+    if($('deep').checked&&res.length){
+      res.sort((a,b)=>b.prob-a.prob);
+      const n=Math.min(want,res.length);
+      for(let i=0;i<n;i++){
+        say('Deep check '+(i+1)+' of '+n+': corners and cards for '+res[i].f.teams.home.name+' v '+res[i].f.teams.away.name);
+        try{
+          const h=await teamStats(res[i].f.teams.home.id,pace);await sleep(pace);
+          const a=await teamStats(res[i].f.teams.away.id,pace);await sleep(pace);
+          const r2=analyse(res[i].f,res[i].p,{h,a});if(r2)res[i]=r2;
+        }catch(e){if(/limit|quota/i.test(e.message)){say('Request limit reached during the deep check.');break}}
+      }
+    }
+    show(res,want);
+  }catch(e){say('Could not load data: '+e.message+' (check your key and internet connection).')}
+  finally{$('go').disabled=false}
+};
+$('copy').onclick=()=>{navigator.clipboard.writeText(lastText).then(()=>say('Picks copied.'))};
+</script></body></html>
